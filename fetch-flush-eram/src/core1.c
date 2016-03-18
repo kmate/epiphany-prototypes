@@ -5,9 +5,9 @@
 
 #define N 10
 
-uint32_t * const _d0 = (uint32_t *)0x1400000;
-uint32_t * const _d1 = (uint32_t *)0x1400028; // _d0 + N * sizeof(uint32_t)
-uint32_t * const _d2 = (uint32_t *)0x1400050; // _d1 + N * sizeof(uint32_t)
+uint32_t * const _d0 = (uint32_t *)0x1000000;
+uint32_t * const _d1 = (uint32_t *)0x1000028; // _d0 + N * sizeof(uint32_t)
+uint32_t * const _d2 = (uint32_t *)0x1000050; // _d1 + N * sizeof(uint32_t)
 
 #define USE_DMA
 

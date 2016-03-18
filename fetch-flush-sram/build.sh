@@ -23,7 +23,7 @@ case $(uname -p) in
 		;;
 esac
 
-mkdir Debug
+mkdir -p Debug
 
 # Build HOST side application
 ${CROSS_PREFIX}gcc -std=gnu99 src/host.c -g -o Debug/host.elf -I ${EINCS} -L ${ELIBS} -le-hal -le-loader

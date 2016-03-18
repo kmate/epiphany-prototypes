@@ -33,14 +33,14 @@ uint32_t output[N];
 
 // d0 <- allocE 0 10
 // offset on ERAM
-off_t d0 = 0x1400000; // 16+4MB, shift up to prevent malloc bug
+off_t d0 = 0x1000000; // 16MB, shift up above libc
 
 // d1 <- allocE 1 10
-off_t d1 = 0x1400028; // d0 + N * sizeof(uint32_t)
+off_t d1 = 0x1000028; // d0 + N * sizeof(uint32_t)
 
 // d2 <- allocE 2 10
 // offset on ERAM after d0 and d1 (which is hidden here)
-off_t d2 = 0x1400050; // d1 + N * sizeof(uint32_t)
+off_t d2 = 0x1000050; // d1 + N * sizeof(uint32_t)
 
 int main(int argc, char *argv[])
 {

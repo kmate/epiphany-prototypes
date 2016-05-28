@@ -56,10 +56,13 @@ int main(int argc, char *argv[])
   e_alloc(&c2h_buf, c2h_buf_o, sizeof(uint32_t));
 
   host_chan_t h2c = host_init_chan(&group, 0, 0, &h2c_buf, h2c_is_open, h2c_is_full);
-  host_chan_t c2h = host_init_chan(&group, 0, 0, &c2h_buf, c2h_is_open, c2h_is_full);
+  host_chan_t c2h = host_init_chan(&group, 0, 1, &c2h_buf, c2h_is_open, c2h_is_full);
 
   printf("Running f on core 0\n");
   e_load("core0.srec", &group, 0, 0, E_TRUE);
+
+  printf("Running g on core 1\n");
+  e_load("core1.srec", &group, 0, 1, E_TRUE);
 
   for (int i = 0; i < N; ++i) {
     host_write_h2c(h2c, input, i * sizeof(uint32_t), 1 * sizeof(uint32_t));

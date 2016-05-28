@@ -60,13 +60,13 @@ bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len) {
 
 #include <stdint.h>
 
-host_chan_t host_init_chan(volatile void *const buf,
+core_chan_t core_init_chan(volatile void *const buf,
                            volatile bool *const is_open,
                            volatile bool *const is_full) {
-  return (host_chan_t) { .buf = buf, .is_open = is_open, .is_full = is_full };
+  return (core_chan_t) { .buf = buf, .is_open = is_open, .is_full = is_full };
 }
 
-bool core_write_c2h(host_chan_t chan, void *src, size_t off, size_t len) {
+bool core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to get empty
@@ -78,7 +78,7 @@ bool core_write_c2h(host_chan_t chan, void *src, size_t off, size_t len) {
   return true;
 }
 
-bool core_read_h2c(host_chan_t chan, void *dst, size_t off, size_t len) {
+bool core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to be filled
@@ -90,10 +90,29 @@ bool core_read_h2c(host_chan_t chan, void *dst, size_t off, size_t len) {
   return true;
 }
 
+bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
+  do {
+    if (!*chan.is_open) {
+      // do not wait for a closed channel to get empty
+      return false;
+    }
+  } while (*chan.is_full);
+  core_write_local(chan.buf, src, 0, off, off + len - 1);
+  *chan.is_full = true;
+  return true;
+}
 
-bool core_write_c2c();
-bool core_read_c2c();
-
+bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len) {
+  do {
+    if (!*chan.is_open) {
+      // do not wait for a closed channel to be filled
+      return false;
+    }
+  } while (!*chan.is_full);
+  core_read_local(chan.buf, dst, 0, off, off + len - 1);
+  *chan.is_full = false;
+  return true;
+}
 
 // based on the epiphany-ebsp library
 void fast_memcpy(void *dst, const void *src, size_t bytes) {

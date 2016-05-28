@@ -80,27 +80,36 @@ void fast_memcpy(void *dst, const void *src, size_t bytes);
 #define core_read_shared(src, dst, offset, lower, upper) \
     e_dma_copy((void*)((dst) + (lower)), (void*)(e_emem_config.base + (src) + (offset) * sizeof(*dst)), ((upper) - (lower) + 1) * sizeof(*dst))
 
-// host-to-core and core-to-host channel
+// host-to-core, core-to-core and core-to-host channel
 
-typedef struct host_chan {
+typedef struct core_chan {
   volatile void *const buf;
   volatile bool *const is_open;
   volatile bool *const is_full;
-} host_chan_t;
+} core_chan_t;
 
 // host-to-core channel initialization
 
-host_chan_t host_init_chan(volatile void *const buf,
+core_chan_t core_init_chan(volatile void *const buf,
                            volatile bool *const is_open,
                            volatile bool *const is_full);
 
 // core-to-host channel write
 
-bool core_write_c2h(host_chan_t chan, void *src, size_t off, size_t len);
+bool core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len);
 
 // host-to-core channel read
 
-bool core_read_h2c(host_chan_t chan, void *dst, size_t off, size_t len);
+bool core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len);
+
+// core-to-core channel write
+
+bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len);
+
+// core-to-core channel read
+
+bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len);
+
 
 #endif /* __epiphany__ */
 

@@ -9,9 +9,9 @@ volatile bool *const h2c_is_open = (bool *)8192;
 volatile bool *const h2c_is_full = (bool *)8196;
 volatile void *const h2c_buf = (void *)0x1000000;
 
-volatile bool *const c2c_is_open = (bool *)((((0 + 32) * 64 + (8 + 1)) << 20) | 8192);
-volatile bool *const c2c_is_full = (bool *)((((0 + 32) * 64 + (8 + 1)) << 20) | 8196);
-volatile void *const c2c_buf = (void *)((((0 + 32) * 64 + (8 + 1)) << 20) | 8300);
+volatile bool *const c2c_is_open = (bool *)((((0 + 32) << 6 + (8 + 1)) << 20) | 8192);
+volatile bool *const c2c_is_full = (bool *)((((0 + 32) << 6 + (8 + 1)) << 20) | 8196);
+volatile void *const c2c_buf = (void *)((((0 + 32) << 6 + (8 + 1)) << 20) | 8208);
 
 // implements f: map (+1)
 int main(void) {
@@ -20,10 +20,10 @@ int main(void) {
   bool open = true;
   uint32_t value[1];
   while (open) {
-    open = core_read_h2c(h2c, value, 0, 1);
+    open = core_read_h2c(h2c, value, 0, sizeof(uint32_t));
     if (open) {
       value[0]++;
-      open = core_write_c2c(c2c, value, 0, 1);
+      open = core_write_c2c(c2c, value, 0, sizeof(uint32_t));
     }
   }
   return EXIT_SUCCESS;

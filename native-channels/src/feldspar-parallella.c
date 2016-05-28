@@ -55,6 +55,10 @@ bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len) {
   return true;
 }
 
+void host_close_chan(host_chan_t chan) {
+  bool is_open[1] = { false };
+  host_write_local(chan.g, chan.r, chan.c, chan.is_open, is_open, 0, 0, 0);
+}
 
 #else /* __epiphany__ */
 
@@ -97,7 +101,7 @@ bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
       return false;
     }
   } while (*chan.is_full);
-  core_write_local(chan.buf, src, 0, off, off + len - 1);
+  //core_write_local(chan.buf, src, 0, off, off + len - 1);
   *chan.is_full = true;
   return true;
 }
@@ -109,9 +113,13 @@ bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len) {
       return false;
     }
   } while (!*chan.is_full);
-  core_read_local(chan.buf, dst, 0, off, off + len - 1);
+  //core_read_local(chan.buf, dst, 0, off, off + len - 1);
   *chan.is_full = false;
   return true;
+}
+
+void core_close_chan(core_chan_t chan) {
+  *chan.is_open = false;
 }
 
 // based on the epiphany-ebsp library

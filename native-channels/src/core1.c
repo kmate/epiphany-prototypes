@@ -7,7 +7,7 @@
 
 volatile bool *const c2c_is_open = (bool *)8192;
 volatile bool *const c2c_is_full = (bool *)8196;
-volatile void *const c2c_buf = (void *)8300;
+volatile void *const c2c_buf = (void *)8208;
 
 volatile bool *const c2h_is_open = (bool *)8200;
 volatile bool *const c2h_is_full = (bool *)8204;
@@ -20,10 +20,10 @@ int main(void) {
   bool open = true;
   uint32_t value[1];
   while (open) {
-    open = core_read_c2c(c2c, value, 0, 1);
+    open = core_read_c2c(c2c, value, 0, sizeof(uint32_t));
     if (open) {
-      value[0] << 1;
-      open = core_write_c2h(c2h, value, 0, 1);
+      value[0] = 7;
+      open = core_write_c2h(c2h, value, 0, sizeof(uint32_t));
     }
   }
   return EXIT_SUCCESS;

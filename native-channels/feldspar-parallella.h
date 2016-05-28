@@ -53,6 +53,10 @@ bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len);
 
 bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len);
 
+// close any kind of channel
+
+void host_close_chan(host_chan_t chan);
+
 #else /* __epiphany__ */
 
 #include <e-lib.h>
@@ -110,6 +114,9 @@ bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len);
 
 bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len);
 
+// close any kind of channel
+
+void core_close_chan(core_chan_t chan);
 
 #endif /* __epiphany__ */
 

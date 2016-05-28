@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
   e_load("core0.srec", &group, 0, 0, E_TRUE);
 
   for (int i = 0; i < N; ++i) {
-    host_write_h2c(h2c, input + i, 0, 1);
-    host_read_c2h(c2h, output + i, 0, 1);
+    host_write_h2c(h2c, input, i * sizeof(uint32_t), 1 * sizeof(uint32_t));
+    host_read_c2h(c2h, output, i * sizeof(uint32_t), 1 * sizeof(uint32_t));
   }
 
   e_free(&h2c_buf);

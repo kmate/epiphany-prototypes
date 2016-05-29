@@ -5,7 +5,7 @@ set -e
 ESDK=${EPIPHANY_HOME}
 ELIBS=${ESDK}/tools/host/lib
 EINCS=${ESDK}/tools/host/include
-ELDF=${ESDK}/bsps/current/fast.ldf
+ELDF=${ESDK}/bsps/current/internal.ldf
 
 SCRIPT=$(readlink -f "$0")
 EXEPATH=$(dirname "$SCRIPT")
@@ -29,8 +29,8 @@ mkdir -p Debug
 ${CROSS_PREFIX}gcc -std=gnu99 -I. src/feldspar-parallella.c src/host.c -g -o Debug/host.elf -I ${EINCS} -L ${ELIBS} -le-hal -le-loader
 
 # Build DEVICE side programs
-e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core0.c -g -o Debug/core0.elf -le-lib -D__epiphany__
-e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core1.c -g -o Debug/core1.elf -le-lib -D__epiphany__
+e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core0.c -g -o Debug/core0.elf -le-lib -O0
+e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core1.c -g -o Debug/core1.elf -le-lib -O0
 
 # Convert ebinaries to SREC files
 e-objcopy --srec-forceS3 --output-target srec Debug/core0.elf Debug/core0.srec

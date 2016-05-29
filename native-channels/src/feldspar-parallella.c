@@ -4,9 +4,16 @@
 
 #ifndef __epiphany__
 
-#include <unistd.h>
+#include <stdint.h>
+#include <time.h>
 
-host_chan_t host_init_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+static inline int wait(uint32_t nsec)
+{
+  struct timespec ts = { .tv_sec = 0, .tv_nsec = nsec };
+  return nanosleep(&ts, NULL);
+}
+
+host_chan_t init_host_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
                            e_mem_t *buf, off_t is_open_o, off_t is_full_o) {
   host_chan_t chan = { .g = g, . r = r, .c = c, .buf = buf
                      , .is_open = is_open_o, .is_full = is_full_o };
@@ -15,6 +22,14 @@ host_chan_t host_init_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
   bool is_full[1] = { false };
   host_write_local(g, r, c, chan.is_full, is_full, 0, 0, 0);
   return chan;
+}
+
+void init_core_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+                    off_t is_open_o, off_t is_full_o) {
+  bool is_open[1] = { true };
+  host_write_local(g, r, c, is_open_o, is_open, 0, 0, 0);
+  bool is_full[1] = { false };
+  host_write_local(g, r, c, is_full_o, is_full, 0, 0, 0);
 }
 
 bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len) {
@@ -28,7 +43,7 @@ bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len) {
       return false;
     }
     host_read_local(chan.g, chan.r, chan.c, chan.is_full, is_full, 0, 0, 0);
-  } while (*is_full && usleep(HOST_CHANNEL_POLL_USEC));
+  } while (*is_full && !wait(HOST_CHANNEL_POLL_NSEC));
   // write item and set channel full
   host_write_shared(chan.buf, src, 0, off, off + len - 1);
   *is_full = true;
@@ -47,7 +62,7 @@ bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len) {
       return false;
     }
     host_read_local(chan.g, chan.r, chan.c, chan.is_full, is_full, 0, 0, 0);
-  } while (!*is_full && usleep(HOST_CHANNEL_POLL_USEC));
+  } while (!*is_full && !wait(HOST_CHANNEL_POLL_NSEC));
   // read item and set channel empty
   host_read_shared(chan.buf, dst, 0, off, off + len - 1);
   *is_full = false;
@@ -64,13 +79,13 @@ void host_close_chan(host_chan_t chan) {
 
 #include <stdint.h>
 
-core_chan_t core_init_chan(volatile void *const buf,
+core_chan_t core_make_chan(volatile void *const buf,
                            volatile bool *const is_open,
                            volatile bool *const is_full) {
   return (core_chan_t) { .buf = buf, .is_open = is_open, .is_full = is_full };
 }
 
-bool core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len) {
+bool core_write_c2h(volatile core_chan_t chan, void *src, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to get empty
@@ -82,7 +97,7 @@ bool core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len) {
   return true;
 }
 
-bool core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len) {
+bool core_read_h2c(volatile core_chan_t chan, void *dst, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to be filled
@@ -96,12 +111,12 @@ bool core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len) {
 
 bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
   do {
-    if (!*chan.is_open) {
+    if (!(*chan.is_open)) {
       // do not wait for a closed channel to get empty
       return false;
     }
   } while (*chan.is_full);
-  //core_write_local(chan.buf, src, 0, off, off + len - 1);
+  core_write_local(chan.buf, src, 0, off, off + len - 1);
   *chan.is_full = true;
   return true;
 }
@@ -113,7 +128,7 @@ bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len) {
       return false;
     }
   } while (!*chan.is_full);
-  //core_read_local(chan.buf, dst, 0, off, off + len - 1);
+  core_read_local(chan.buf, dst, 0, off, off + len - 1);
   *chan.is_full = false;
   return true;
 }
@@ -122,7 +137,7 @@ void core_close_chan(core_chan_t chan) {
   *chan.is_open = false;
 }
 
-// based on the epiphany-ebsp library
+// based on the epiphany-bsp library
 void fast_memcpy(void *dst, const void *src, size_t bytes) {
     unsigned bits = (unsigned) dst | (unsigned) src;
     if (0 == bits & 0x7) { // align 8

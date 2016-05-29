@@ -10,17 +10,20 @@
 
 #include "feldspar-parallella.h"
 
-#define N 10
+#define N 4
 
 uint32_t input[N];
 uint32_t output[N];
 
-off_t h2c_is_open = 8192;
-off_t h2c_is_full = 8196;
+off_t h2c_is_open = 0x2000;
+off_t h2c_is_full = 0x2004;
 off_t h2c_buf_o = 0x1000000;
 
-off_t c2h_is_open = 8200;
-off_t c2h_is_full = 8204;
+off_t c2c_is_open = 0x2000;
+off_t c2c_is_full = 0x2004;
+
+off_t c2h_is_open = 0x200c;
+off_t c2h_is_full = 0x2012;
 off_t c2h_buf_o = 0x1000004;
 
 int main(int argc, char *argv[])
@@ -54,8 +57,9 @@ int main(int argc, char *argv[])
   e_alloc(&h2c_buf, h2c_buf_o, sizeof(uint32_t));
   e_alloc(&c2h_buf, c2h_buf_o, sizeof(uint32_t));
 
-  host_chan_t h2c = host_init_chan(&group, 0, 0, &h2c_buf, h2c_is_open, h2c_is_full);
-  host_chan_t c2h = host_init_chan(&group, 0, 1, &c2h_buf, c2h_is_open, c2h_is_full);
+  host_chan_t h2c = init_host_chan(&group, 0, 0, &h2c_buf, h2c_is_open, h2c_is_full);
+  host_chan_t c2h = init_host_chan(&group, 0, 1, &c2h_buf, c2h_is_open, c2h_is_full);
+  init_core_chan(&group, 0, 1, c2c_is_open, c2c_is_full);
 
   printf("Running f on core 0\n");
   e_load("core0.srec", &group, 0, 0, E_TRUE);
@@ -67,6 +71,9 @@ int main(int argc, char *argv[])
     host_write_h2c(h2c, input, i * sizeof(uint32_t), sizeof(uint32_t));
     host_read_c2h(c2h, output, i * sizeof(uint32_t), sizeof(uint32_t));
   }
+
+  host_close_chan(h2c);
+  host_close_chan(c2h);
 
   e_free(&h2c_buf);
   e_free(&c2h_buf);

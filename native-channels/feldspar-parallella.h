@@ -23,10 +23,10 @@
 #define host_read_shared(src, dst, offset, lower, upper) \
     e_read(src, 0, 0, (offset) * sizeof(*dst), (dst) + (lower), ((upper) - (lower) + 1) * sizeof(*dst))
 
-// host channel polling interval in microseconds
+// host channel polling interval in nanoseconds
 
-#ifndef HOST_CHANNEL_POLL_USEC
-#define HOST_CHANNEL_POLL_USEC 100
+#ifndef HOST_CHANNEL_POLL_NSEC
+#define HOST_CHANNEL_POLL_NSEC 10000
 #endif
 
 // host-to-core and core-to-host channel
@@ -40,10 +40,15 @@ typedef struct host_chan {
   off_t is_full;
 } host_chan_t;
 
-// host-to-core channel initialization
+// host-to-core and core-to-host channel initialization
 
-host_chan_t host_init_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+host_chan_t init_host_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
                            e_mem_t *buf, off_t is_open_o, off_t is_full_o);
+
+// core-to-core channel initialization
+
+void init_core_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+                    off_t is_open_o, off_t is_full_o);
 
 // host-to-core channel write
 
@@ -84,7 +89,7 @@ void fast_memcpy(void *dst, const void *src, size_t bytes);
 #define core_read_shared(src, dst, offset, lower, upper) \
     e_dma_copy((void*)((dst) + (lower)), (void*)(e_emem_config.base + (src) + (offset) * sizeof(*dst)), ((upper) - (lower) + 1) * sizeof(*dst))
 
-// host-to-core, core-to-core and core-to-host channel
+// host-to-core, core-to-core and core-to-host channel wrapper for cores
 
 typedef struct core_chan {
   volatile void *const buf;
@@ -92,9 +97,9 @@ typedef struct core_chan {
   volatile bool *const is_full;
 } core_chan_t;
 
-// host-to-core channel initialization
+// creates a channel wrapper
 
-core_chan_t core_init_chan(volatile void *const buf,
+core_chan_t core_make_chan(volatile void *const buf,
                            volatile bool *const is_open,
                            volatile bool *const is_full);
 

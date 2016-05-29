@@ -13,15 +13,19 @@ static inline int wait(uint32_t nsec)
   return nanosleep(&ts, NULL);
 }
 
-host_chan_t init_host_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
-                           e_mem_t *buf, off_t is_open_o, off_t is_full_o) {
-  host_chan_t chan = { .g = g, . r = r, .c = c, .buf = buf
-                     , .is_open = is_open_o, .is_full = is_full_o };
+void init_host_chan(host_chan_t *chan,
+                    e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+                    e_mem_t *buf, off_t is_open_o, off_t is_full_o) {
+  chan->g = g;
+  chan->r = r;
+  chan->c = c;
+  chan->buf = buf;
+  chan->is_open = is_open_o;
+  chan->is_full = is_full_o;
   bool is_open[1] = { true };
-  host_write_local(g, r, c, chan.is_open, is_open, 0, 0, 0);
+  host_write_local(g, r, c, is_open_o, is_open, 0, 0, 0);
   bool is_full[1] = { false };
-  host_write_local(g, r, c, chan.is_full, is_full, 0, 0, 0);
-  return chan;
+  host_write_local(g, r, c, is_full_o, is_full, 0, 0, 0);
 }
 
 void init_core_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
@@ -79,10 +83,13 @@ void host_close_chan(host_chan_t chan) {
 
 #include <stdint.h>
 
-core_chan_t core_make_chan(volatile void *const buf,
-                           volatile bool *const is_open,
-                           volatile bool *const is_full) {
-  return (core_chan_t) { .buf = buf, .is_open = is_open, .is_full = is_full };
+void core_make_chan(core_chan_t *chan,
+                    volatile void *const buf,
+                    volatile bool *const is_open,
+                    volatile bool *const is_full) {
+  chan->buf = buf;
+  chan->is_open = is_open;
+  chan->is_full = is_full;
 }
 
 bool core_write_c2h(volatile core_chan_t chan, void *src, size_t off, size_t len) {

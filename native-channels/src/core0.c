@@ -15,8 +15,10 @@ volatile void *const c2c_buf = (void *)((((0 + 32) * 64 + (8 + 1)) << 20) | 0x20
 
 // implements f: map (+1)
 int main(void) {
-  core_chan_t h2c = core_make_chan(h2c_buf, h2c_is_open, h2c_is_full);
-  core_chan_t c2c = core_make_chan(c2c_buf, c2c_is_open, c2c_is_full);
+  core_chan_t h2c;
+  core_make_chan(&h2c, h2c_buf, h2c_is_open, h2c_is_full);
+  core_chan_t c2c;
+  core_make_chan(&c2c, c2c_buf, c2c_is_open, c2c_is_full);
   bool open = true;
   uint32_t value[1];
   while (open) {

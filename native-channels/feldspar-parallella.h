@@ -42,8 +42,9 @@ typedef struct host_chan {
 
 // host-to-core and core-to-host channel initialization
 
-host_chan_t init_host_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
-                           e_mem_t *buf, off_t is_open_o, off_t is_full_o);
+void init_host_chan(host_chan_t *chan,
+                    e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
+                    e_mem_t *buf, off_t is_open_o, off_t is_full_o);
 
 // core-to-core channel initialization
 
@@ -92,16 +93,17 @@ void fast_memcpy(void *dst, const void *src, size_t bytes);
 // host-to-core, core-to-core and core-to-host channel wrapper for cores
 
 typedef struct core_chan {
-  volatile void *const buf;
-  volatile bool *const is_open;
-  volatile bool *const is_full;
+  volatile void *buf;
+  volatile bool *is_open;
+  volatile bool *is_full;
 } core_chan_t;
 
 // creates a channel wrapper
 
-core_chan_t core_make_chan(volatile void *const buf,
-                           volatile bool *const is_open,
-                           volatile bool *const is_full);
+void core_make_chan(core_chan_t *chan,
+                    volatile void *const buf,
+                    volatile bool *const is_open,
+                    volatile bool *const is_full);
 
 // core-to-host channel write
 

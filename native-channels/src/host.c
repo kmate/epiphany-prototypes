@@ -57,8 +57,10 @@ int main(int argc, char *argv[])
   e_alloc(&h2c_buf, h2c_buf_o, sizeof(uint32_t));
   e_alloc(&c2h_buf, c2h_buf_o, sizeof(uint32_t));
 
-  host_chan_t h2c = init_host_chan(&group, 0, 0, &h2c_buf, h2c_is_open, h2c_is_full);
-  host_chan_t c2h = init_host_chan(&group, 0, 1, &c2h_buf, c2h_is_open, c2h_is_full);
+  host_chan_t h2c;
+  init_host_chan(&h2c, &group, 0, 0, &h2c_buf, h2c_is_open, h2c_is_full);
+  host_chan_t c2h;
+  init_host_chan(&c2h, &group, 0, 1, &c2h_buf, c2h_is_open, c2h_is_full);
   init_core_chan(&group, 0, 1, c2c_is_open, c2c_is_full);
 
   printf("Running f on core 0\n");

@@ -22,10 +22,10 @@ int main(void) {
   bool open = true;
   uint32_t value[1];
   while (open) {
-    open = core_read_c2c(c2c, value, 0, sizeof(uint32_t));
+    open = core_read_c2c(c2c, value, 0, 1);
     if (open) {
       value[0] *= 2;
-      open = core_write_c2h(c2h, value, 0, sizeof(uint32_t));
+      open = core_write_c2h(c2h, value, 0, 1);
     }
   }
   return EXIT_SUCCESS;

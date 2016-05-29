@@ -53,11 +53,17 @@ void init_core_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
 
 // host-to-core channel write
 
-bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len);
+#define host_write_h2c(chan, src, off, len) \
+    _host_write_h2c((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len);
 
 // core-to-host channel read
 
-bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len);
+#define host_read_c2h(chan, src, off, len) \
+    _host_read_c2h((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len);
 
 // close any kind of channel
 
@@ -107,19 +113,31 @@ void core_make_chan(core_chan_t *chan,
 
 // core-to-host channel write
 
-bool core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len);
+#define core_write_c2h(chan, src, off, len) \
+    _core_write_c2h((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _core_write_c2h(core_chan_t chan, void *src, size_t off, size_t len);
 
 // host-to-core channel read
 
-bool core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len);
+#define core_read_h2c(chan, src, off, len) \
+    _core_read_h2c((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _core_read_h2c(core_chan_t chan, void *dst, size_t off, size_t len);
 
 // core-to-core channel write
 
-bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len);
+#define core_write_c2c(chan, src, off, len) \
+    _core_write_c2c((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len);
 
 // core-to-core channel read
 
-bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len);
+#define core_read_c2c(chan, src, off, len) \
+    _core_read_c2c((chan), (src), (off) * sizeof(*src), (len) * sizeof(*src));
+
+bool _core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len);
 
 // close any kind of channel
 

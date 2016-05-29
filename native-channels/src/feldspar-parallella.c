@@ -36,7 +36,7 @@ void init_core_chan(e_epiphany_t *g, e_coreid_t r, e_coreid_t c,
   host_write_local(g, r, c, is_full_o, is_full, 0, 0, 0);
 }
 
-bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len) {
+bool _host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len) {
   // wait for empty space
   bool is_full[1] = { true };
   do {
@@ -55,7 +55,7 @@ bool host_write_h2c(host_chan_t chan, void *src, size_t off, size_t len) {
   return true;
 }
 
-bool host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len) {
+bool _host_read_c2h(host_chan_t chan, void *dst, size_t off, size_t len) {
   // wait for an item
   bool is_full[1] = { false };
   do {
@@ -92,7 +92,7 @@ void core_make_chan(core_chan_t *chan,
   chan->is_full = is_full;
 }
 
-bool core_write_c2h(volatile core_chan_t chan, void *src, size_t off, size_t len) {
+bool _core_write_c2h(volatile core_chan_t chan, void *src, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to get empty
@@ -104,7 +104,7 @@ bool core_write_c2h(volatile core_chan_t chan, void *src, size_t off, size_t len
   return true;
 }
 
-bool core_read_h2c(volatile core_chan_t chan, void *dst, size_t off, size_t len) {
+bool _core_read_h2c(volatile core_chan_t chan, void *dst, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to be filled
@@ -116,7 +116,7 @@ bool core_read_h2c(volatile core_chan_t chan, void *dst, size_t off, size_t len)
   return true;
 }
 
-bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
+bool _core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
   do {
     if (!(*chan.is_open)) {
       // do not wait for a closed channel to get empty
@@ -128,7 +128,7 @@ bool core_write_c2c(core_chan_t chan, void *src, size_t off, size_t len) {
   return true;
 }
 
-bool core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len) {
+bool _core_read_c2c(core_chan_t chan, void *dst, size_t off, size_t len) {
   do {
     if (!*chan.is_open) {
       // do not wait for a closed channel to be filled

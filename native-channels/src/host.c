@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
   e_load("core1.srec", &group, 0, 1, E_TRUE);
 
   for (int i = 0; i < N; ++i) {
-    host_write_h2c(h2c, input, i * sizeof(uint32_t), sizeof(uint32_t));
-    host_read_c2h(c2h, output, i * sizeof(uint32_t), sizeof(uint32_t));
+    host_write_h2c(h2c, input, i, 1);
+    host_read_c2h(c2h, output, i, 1);
   }
 
   host_close_chan(h2c);

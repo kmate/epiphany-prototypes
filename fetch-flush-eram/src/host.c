@@ -79,13 +79,13 @@ int main(int argc, char *argv[])
 
   //                                                       -- onCore 0 (f d0 d1)
   printf("Running f on core 0\n");
-  e_load("core0.srec", &group, 0, 0, E_TRUE);
+  e_load("core0.elf", &group, 0, 0, E_TRUE);
   // should poll until finish (maybe a software interrupt later?)
   usleep(1000);
 
   //                                                       -- onCore 1 (g d1 d2)
   printf("Running g on core 1\n");
-  e_load("core1.srec", &group, 0, 1, E_TRUE);
+  e_load("core1.elf", &group, 0, 1, E_TRUE);
   // should poll until finish (maybe a software interrupt later?)
   usleep(1000);
 

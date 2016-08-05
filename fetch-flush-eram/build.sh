@@ -31,7 +31,3 @@ ${CROSS_PREFIX}gcc -std=gnu99 src/host.c -g -o Debug/host.elf -I ${EINCS} -L ${E
 # Build DEVICE side programs
 e-gcc -std=c99 -T ${ELDF} src/core0.c -g -o Debug/core0.elf -le-lib
 e-gcc -std=c99 -T ${ELDF} src/core1.c -g -o Debug/core1.elf -le-lib
-
-# Convert ebinaries to SREC files
-e-objcopy --srec-forceS3 --output-target srec Debug/core0.elf Debug/core0.srec
-e-objcopy --srec-forceS3 --output-target srec Debug/core1.elf Debug/core1.srec

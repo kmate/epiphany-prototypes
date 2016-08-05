@@ -32,6 +32,3 @@ ${CROSS_PREFIX}gcc -std=gnu99 -I. src/feldspar-parallella.c src/host.c -g -o Deb
 e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core0.c -g -o Debug/core0.elf -le-lib -O0
 e-gcc -std=gnu99 -T ${ELDF} -I. src/feldspar-parallella.c src/core1.c -g -o Debug/core1.elf -le-lib -O0
 
-# Convert ebinaries to SREC files
-e-objcopy --srec-forceS3 --output-target srec Debug/core0.elf Debug/core0.srec
-e-objcopy --srec-forceS3 --output-target srec Debug/core1.elf Debug/core1.srec

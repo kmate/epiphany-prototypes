@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
   e_open(&group, 0, 0, 1, 3);
   e_reset_group(&group);
 
+  e_load("core0.elf", &group, 0, 0, E_FALSE);
+  e_load("core1.elf", &group, 0, 1, E_FALSE);
+
   e_mem_t h2c_buf, c2h_buf;
   e_alloc(&h2c_buf, h2c_buf_o, sizeof(uint32_t));
   e_alloc(&c2h_buf, c2h_buf_o, sizeof(uint32_t));
@@ -64,10 +67,10 @@ int main(int argc, char *argv[])
   init_core_chan(&group, 0, 1, c2c_is_open, c2c_is_full);
 
   printf("Running f on core 0\n");
-  e_load("core0.srec", &group, 0, 0, E_TRUE);
+  e_start(&group, 0, 0);
 
   printf("Running g on core 1\n");
-  e_load("core1.srec", &group, 0, 1, E_TRUE);
+  e_start(&group, 0, 1);
 
   for (int i = 0; i < N; ++i) {
     host_write_h2c(h2c, input, i, 1);

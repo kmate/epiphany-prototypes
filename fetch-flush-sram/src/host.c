@@ -66,19 +66,22 @@ int main(int argc, char *argv[])
   e_open(&group, 0, 0, 1, 3);
   e_reset_group(&group);
 
+  e_load("core0.elf", &group, 0, 0, E_FALSE);
+  e_load("core1.elf", &group, 0, 1, E_FALSE);
+
   //                                                    -- fetch d0 (0, 9) input
   // to bank1 of core 0
   e_write(&group, 0, 0, d0, input, N * sizeof(uint32_t));
 
   //                                                       -- onCore 0 (f d0 d1)
   printf("Running f on core 0\n");
-  e_load("core0.elf", &group, 0, 0, E_TRUE);
+  e_start(&group, 0, 0);
   // should poll until finish (maybe a software interrupt later?)
   usleep(1000);
 
   //                                                       -- onCore 1 (g d1 d2)
   printf("Running g on core 1\n");
-  e_load("core1.elf", &group, 0, 1, E_TRUE);
+  e_start(&group, 0, 1);
   // should poll until finish (maybe a software interrupt later?)
   usleep(1000);
 
